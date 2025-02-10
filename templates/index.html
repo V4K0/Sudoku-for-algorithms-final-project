@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        button {
+            display: block;
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px auto;
+            width: 200px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 650px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #sudoku-grid {
+            display: none; /* Initially hide the grid */
+            grid-template-columns: repeat(9, 50px);
+            gap: 3px;
+            margin: 20px auto;
+            justify-content: center;
+            grid-template-rows: repeat(9, 50px);
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            font-size: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            transition: background-color 0.2s ease;
+        }
+
+        .cell.readonly {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .cell:hover {
+            background-color: #f4f4f4;
+            cursor: pointer;
+        }
+
+        .cell.selected {
+            background-color: #d1f7d5;
+        }
+
+        .cell[contenteditable="true"]:empty {
+            background-color: #ffffe0;
+        }
+
+        .name-field {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .name-field label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .name-field input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .lives {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #leaderboard-container {
+            margin-top: 30px;
+        }
+
+        #leaderboard-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #leaderboard-list li {
+            margin-bottom: 8px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .input-container input {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Sudoku</h1>
+        <div id="game-container">
+            <div class="name-field">
+            </div>
+            <div class="input-container">
+                <label for="level">Choose a difficulty level (1-10):</label>
+                <input type="number" id="level" min="1" max="10" value="1">
+            </div>
+            <button class="btn" id="start-game">Start Game</button>
+            <div id="lives" class="lives"></div>
+            <div id="sudoku-grid"></div> <!-- Hidden initially -->
+        </div>
+
+        <div id="leaderboard-container">
+            <div class="input-container">
+                <label for="leaderboard-level">Choose a level to view the leaderboard:</label>
+                <input type="number" id="leaderboard-level" min="1" max="10" value="1">
+            </div>
+            <button class="btn" id="view-leaderboard">View Leaderboard</button>
+            <ul id="leaderboard-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const gameContainer = document.getElementById("game-container");
+            const nameField = document.createElement("div");
+            nameField.classList.add("name-field");
+            nameField.innerHTML = `
+                <label for="name">Enter your name:</label>
+                <input type="text" id="name" placeholder="Your name" autocomplete="off">
+            `;
+            gameContainer.insertBefore(nameField, gameContainer.firstChild);
+        });
+
+        document.getElementById("view-leaderboard").addEventListener("click", async () => {
+            const level = document.getElementById("leaderboard-level").value;
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/leaderboard?level=${level}`);
+                const data = await response.json();
+
+                const leaderboardList = document.getElementById("leaderboard-list");
+                leaderboardList.innerHTML = ""; // Clear any previous leaderboard
+
+                if (response.ok) {
+                    if (data.leaderboard && data.leaderboard.length > 0) {
+                        data.leaderboard.forEach(entry => {
+                            const li = document.createElement("li");
+                            li.innerText = `${entry.rank}. ${entry.name}: ${entry.time}`;
+                            leaderboardList.appendChild(li);
+                        });
+                    } else {
+                        leaderboardList.innerHTML = `<li>${data.message || "No entries found."}</li>`;
+                    }
+                } else {
+                    leaderboardList.innerHTML = `<li>${data.error || "An error occurred."}</li>`;
+                }
+            } catch (error) {
+                console.error("Error fetching leaderboard:", error);
+                alert("Unable to fetch leaderboard. Please try again later.");
+            }
+        });
+
+        document.getElementById("start-game").addEventListener("click", async () => {
+            const name = document.getElementById("name").value.trim();
+            const level = document.getElementById("level").value;
+
+            if (!name) {
+                alert("Please enter your name before starting the game.");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/start_game", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, level: parseInt(level) })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    sessionId = data.session_id; // Save session ID
+                    renderGrid(data.grid);
+                    document.getElementById("lives").innerText = `Lives: ${data.lives}`;
+                    document.getElementById("sudoku-grid").style.display = "grid"; // Show the grid
+                } else {
+                    alert(data.error || "An error occurred.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Server error. Please try again later.");
+            }
+        });
+
+        function clearGrid() {
+            const container = document.getElementById("sudoku-grid");
+            container.innerHTML = ""; // Remove all grid cells
+            document.getElementById("sudoku-grid").style.display = "none"; // Hide the grid
+        }     
+        
+    
+        function disableGridInputs() {
+            const cells = document.querySelectorAll("#sudoku-grid .cell");
+            cells.forEach(cell => {
+                cell.contentEditable = false; // Disable editing for all cells
+                cell.style.backgroundColor = "#e0e0e0"; // Optional: Dim the grid for visual feedback
+            });
+        }
+
+        function renderGrid(grid) {
+            const container = document.getElementById("sudoku-grid");
+            container.innerHTML = ""; // Clear the existing grid
+        
+            grid.forEach((row, rIdx) => {
+                row.forEach((num, cIdx) => {
+                    const cell = document.createElement("div");
+                    cell.className = "cell" + (num !== 0 ? " readonly" : "");
+                    cell.innerText = num || "";
+        
+                    // Add contentEditable only for empty cells
+                    if (num === 0) {
+                        cell.contentEditable = true;
+        
+                        // Highlight selected cell
+                        cell.addEventListener("focus", () => {
+                            cell.classList.add("selected");
+                        });
+                        cell.addEventListener("blur", () => {
+                            cell.classList.remove("selected");
+                        });
+        
+                        // Validate input
+                        cell.addEventListener("input", () => {
+                            const value = parseInt(cell.innerText);
+                            if (!value || value < 1 || value > 9) {
+                                cell.innerText = ""; // Not allow invalid input 
+                            }
+                        });
+        
+                        // Update the grid when the user leaves the cell
+                        cell.addEventListener("blur", () => {
+                            const value = parseInt(cell.innerText) || 0;
+                            if (value >= 1 && value <= 9) {
+                                makeMove(rIdx, cIdx, value);
+                            } 
+                        });
+                    }
+        
+                    // Add thicker borders for 3x3 grid lines
+                    if (rIdx % 3 === 0) {
+                        cell.style.borderTop = "3px solid black"; // Top border for rows 0, 3, 6
+                    }
+                    if (cIdx % 3 === 0) {
+                        cell.style.borderLeft = "3px solid black"; // Left border for columns 0, 3, 6
+                    }
+        
+                    // Add a border to the bottom and right of the grid
+                    if (rIdx === 8) {
+                        cell.style.borderBottom = "3px solid black"; // Bottom edge of the grid
+                    }
+                    if (cIdx === 8) {
+                        cell.style.borderRight = "3px solid black"; // Right edge of the grid
+                    }
+        
+                    container.appendChild(cell);
+                });
+            });
+        }
+        
+        async function makeMove(row, col, num) {
+            if (!sessionId) {
+                console.error("Session ID is missing!");
+                alert("Session ID is missing. Please restart the game.");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/make_move", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ row, col, num, session_id: sessionId })
+                });
+
+                const data = await response.json();
+
+                console.log("Server response:", data);
+
+                if (response.ok) {
+                    if (data.success === "Puzzle complete!") {
+                        alert(`Congratulations! ${data.success} Time taken: ${data.time}`);
+                        disableGridInputs(); // Disable the grid to prevent further moves
+                        sessionId = null; // Clear session ID to prevent further requests
+                        document.getElementById("lives").innerText = ""; // Clear lives display
+                        if (data.reset_grid) {
+                            clearGrid(); // Clear the grid
+                        }
+                        return; // Stop processing
+                    }
+
+                    if (data.error === "Game over. No lives remaining.") {
+                        alert("Game Over! You have no lives remaining. Better luck next time!");
+                        disableGridInputs(); // Disable the grid to prevent further moves
+                        sessionId = null; // Clear session ID to prevent further requests
+                        document.getElementById("lives").innerText = ""; // Clear lives display
+                        if (data.reset_grid) {
+                            clearGrid(); // Clear the grid
+                        }
+                        return; // Stop processing
+                    }
+
+                    if (data.error) {
+                        alert(data.error); // Show the error message (e.g., incorrect move)
+                        renderGrid(data.grid); // Re-render grid to reflect changes
+                    } else {
+                        renderGrid(data.grid); // Update the grid
+                    }
+
+                    document.getElementById("lives").innerText = `Lives: ${data.lives}`;
+                } else {
+                    alert("An unexpected error occurred.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Server error. Please try again later.");
+            }
+        }
+
+        
+    </script>
+</body>
+</html>

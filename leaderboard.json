@@ -1,0 +1,233 @@
+{
+    "Michail-level-10": {
+        "name": "Michail",
+        "time": [
+            10,
+            11,
+            3
+        ],
+        "level": 10,
+        "date": "2024-11-22"
+    },
+    "Vako-level-10": {
+        "name": "Vako",
+        "time": [
+            0,
+            14,
+            9
+        ],
+        "level": 10,
+        "date": "2024-11-20"
+    },
+    "Simonida-level-10": {
+        "name": "Simonida",
+        "time": [
+            0,
+            12,
+            7
+        ],
+        "level": 10,
+        "date": "2024-11-22"
+    },
+    "Kenny-level-9": {
+        "name": "Kenny",
+        "time": [
+            1,
+            0,
+            14
+        ],
+        "level": 9,
+        "date": "2024-11-20"
+    },
+    "Jose-level-4": {
+        "name": "Jose",
+        "time": [
+            0,
+            24,
+            2
+        ],
+        "level": 4,
+        "date": "2024-11-21"
+    },
+    "Liam-level-1": {
+        "name": "Liam",
+        "time": [
+            0,
+            30,
+            10
+        ],
+        "level": 1,
+        "date": "2024-11-22"
+    },
+    "Sophia-level-1": {
+        "name": "Sophia",
+        "time": [
+            0,
+            32,
+            5
+        ],
+        "level": 1,
+        "date": "2024-11-21"
+    },
+    "Ethan-level-2": {
+        "name": "Ethan",
+        "time": [
+            0,
+            28,
+            14
+        ],
+        "level": 2,
+        "date": "2024-11-20"
+    },
+    "Ava-level-2": {
+        "name": "Ava",
+        "time": [
+            0,
+            29,
+            6
+        ],
+        "level": 2,
+        "date": "2024-11-21"
+    },
+    "Oliver-level-3": {
+        "name": "Oliver",
+        "time": [
+            0,
+            26,
+            8
+        ],
+        "level": 3,
+        "date": "2024-11-22"
+    },
+    "Emma-level-3": {
+        "name": "Emma",
+        "time": [
+            0,
+            27,
+            11
+        ],
+        "level": 3,
+        "date": "2024-11-22"
+    },
+    "James-level-4": {
+        "name": "James",
+        "time": [
+            0,
+            24,
+            15
+        ],
+        "level": 4,
+        "date": "2024-11-21"
+    },
+    "Mia-level-4": {
+        "name": "Mia",
+        "time": [
+            0,
+            23,
+            10
+        ],
+        "level": 4,
+        "date": "2024-11-22"
+    },
+    "Lucas-level-5": {
+        "name": "Lucas",
+        "time": [
+            0,
+            21,
+            7
+        ],
+        "level": 5,
+        "date": "2024-11-22"
+    },
+    "Charlotte-level-5": {
+        "name": "Charlotte",
+        "time": [
+            0,
+            22,
+            13
+        ],
+        "level": 5,
+        "date": "2024-11-21"
+    },
+    "Henry-level-6": {
+        "name": "Henry",
+        "time": [
+            0,
+            19,
+            5
+        ],
+        "level": 6,
+        "date": "2024-11-20"
+    },
+    "Amelia-level-6": {
+        "name": "Amelia",
+        "time": [
+            0,
+            18,
+            12
+        ],
+        "level": 6,
+        "date": "2024-11-21"
+    },
+    "Benjamin-level-7": {
+        "name": "Benjamin",
+        "time": [
+            0,
+            16,
+            9
+        ],
+        "level": 7,
+        "date": "2024-11-22"
+    },
+    "Harper-level-7": {
+        "name": "Harper",
+        "time": [
+            0,
+            15,
+            8
+        ],
+        "level": 7,
+        "date": "2024-11-22"
+    },
+    "William-level-8": {
+        "name": "William",
+        "time": [
+            1,
+            13,
+            11
+        ],
+        "level": 8,
+        "date": "2024-11-20"
+    },
+    "Evelyn-level-8": {
+        "name": "Evelyn",
+        "time": [
+            1,
+            12,
+            7
+        ],
+        "level": 8,
+        "date": "2024-11-21"
+    },
+    "Alexander-level-9": {
+        "name": "Alexander",
+        "time": [
+            1,
+            10,
+            6
+        ],
+        "level": 9,
+        "date": "2024-11-22"
+    },
+    "Isabella-level-9": {
+        "name": "Isabella",
+        "time": [
+            1,
+            9,
+            8
+        ],
+        "level": 9,
+        "date": "2024-11-22"
+    }
+}
+    
